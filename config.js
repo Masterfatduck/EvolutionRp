@@ -8,13 +8,13 @@ const WebsiteConfig = {
     discordInvite: "https://discord.gg/FSSGVYsrhP", 
     
     // DISCORD LOGIN SETUP
-    discordClientId: "1478438505398009987", 
-    redirectUri: "SÆT_DIN_RIGTIGE_URL_HER/index.html", // F.eks. https://evolutionrp.dk/index.html
+    discordClientId: "1478767371593322546", 
+    redirectUri: "https://discord.com/oauth2/authorize?client_id=1478767371593322546&response_type=code&redirect_uri=https%3A%2F%2Fevolutionrp1.netlify.app&scope=identify+email", // F.eks. https://evolutionrp.dk/index.html
 
     // DISCORD WEBHOOKS
     webhooks: {
-        applications: "DIN_ANSØGNING_WEBHOOK", // Her lander nye ansøgninger
-        answers: "DIT_SVAR_WEBHOOK"            // Her lander svar (godkendt/afvist)
+        applications: "https://discord.com/api/webhooks/1478770783005446291/ftX7lg6Uy23TIy4VwMLgSsDAEMThI1v0kpVSUJQtdkzlAn6nNsfFMXACXD00lFKN7Z5T", // Her lander nye ansøgninger
+        answers: "https://discord.com/api/webhooks/1478770207106269184/1kaJkNpHnivZAVXhz3sXoAxxvP0iz5yhb7SllLWVGEJBqIWoK8fwF23WQEx9-_EivJcP"            // Her lander svar (godkendt/afvist)
     },
 
     // STYR ANSØGNINGER HER (open / closed)
