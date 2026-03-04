@@ -11,6 +11,9 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>window.supabasejs = supabase;</script>
     <script src="config.js"></script>
     <style>
         :root {
@@ -289,19 +292,12 @@
 
         document.getElementById('applyForm').onsubmit = async (e) => {
             e.preventDefault();
-            const webhook = WebsiteConfig.webhooks.applications;
-            if (!webhook || webhook.includes("DIN_ANSØGNING")) {
-                alert("Webhook er ikke sat op i config.js endnu!");
-                return;
-            }
-
-            const currentUrl = new URL(window.location.href);
-            const pathParts = currentUrl.pathname.split('/');
-            pathParts[pathParts.length - 1] = 'admin.html';
-            const adminUrl = currentUrl.origin + pathParts.join('/');
             
             const name = document.getElementById('name').value;
             const job = document.getElementById('jobType').value;
+            const age = document.getElementById('age').value;
+            const discord = document.getElementById('discord').value;
+            const steam = document.getElementById('steam').value;
             
             const storedUser = localStorage.getItem('evo_user_data');
             const userData = storedUser ? JSON.parse(storedUser) : null;
@@ -313,43 +309,85 @@
                 }
             }
 
-            const data = {
-                embeds: [{
-                    title: "Ny Ansøgning: " + job,
-                    description: `**[✅ GODKEND HER](${adminUrl}?status=GODKENDT&name=${encodeURIComponent(name)}&job=${encodeURIComponent(job)}&userId=${userId})** | **[❌ AFVIS HER](${adminUrl}?status=AFVIST&name=${encodeURIComponent(name)}&job=${encodeURIComponent(job)}&userId=${userId})**`,
-                    color: 3447003,
-                    fields: [
-                        { name: "Navn", value: name, inline: true },
-                        { name: "Alder", value: document.getElementById('age').value, inline: true },
-                        { name: "Discord", value: document.getElementById('discord').value, inline: true },
-                        { name: "Steam", value: document.getElementById('steam').value, inline: true },
-                        { name: document.getElementById('label1').innerText, value: document.getElementById('field1').value },
-                        { name: document.getElementById('label2').innerText, value: document.getElementById('field2').value },
-                        { name: document.getElementById('label3').innerText, value: document.getElementById('field3').value },
-                        { name: document.getElementById('label5').innerText, value: document.getElementById('field5').value },
-                        { name: document.getElementById('label6').innerText, value: document.getElementById('field6').value }
-                    ],
-                    footer: { text: "Evolution RP Ansøgningssystem" },
-                    timestamp: new Date()
-                }]
+            // Saml alle dynamiske felter
+            const applicationData = {
+                user_id: userId,
+                name: name,
+                job: job,
+                age: age,
+                discord_name: discord,
+                steam_name: steam,
+                field1: { label: document.getElementById('label1').innerText, value: document.getElementById('field1').value },
+                field2: { label: document.getElementById('label2').innerText, value: document.getElementById('field2').value },
+                field3: { label: document.getElementById('label3').innerText, value: document.getElementById('field3').value },
+                field5: { label: document.getElementById('label5').innerText, value: document.getElementById('field5').value },
+                field6: { label: document.getElementById('label6').innerText, value: document.getElementById('field6').value },
+                status: 'PENDING',
+                created_at: new Date()
             };
 
             if (document.getElementById('group4').style.display !== 'none') {
-                data.embeds[0].fields.push({ name: document.getElementById('label4').innerText, value: document.getElementById('field4').value });
+                applicationData.field4 = { label: document.getElementById('label4').innerText, value: document.getElementById('field4').value };
             }
 
-            try {
-                const response = await fetch(webhook, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                if (response.ok) {
-                    alert("Ansøgning sendt succesfuldt!");
-                    closeModal();
-                    e.target.reset();
-                } else { alert("Fejl ved afsendelse. Tjek din webhook."); }
-            } catch (err) { alert("Kunne ikke forbinde til Discord."); }
+            // 1. Gem i Supabase (hvis konfigureret)
+            let supabaseSaved = false;
+            if (supabaseClient) {
+                try {
+                    const { error } = await supabaseClient
+                        .from('applications')
+                        .insert([applicationData]);
+                    
+                    if (!error) supabaseSaved = true;
+                    else console.error("Supabase fejl:", error);
+                } catch (err) { console.error("Kunne ikke gemme i Supabase:", err); }
+            }
+
+            // 2. Send til Discord Webhook
+            const webhook = WebsiteConfig.webhooks.applications;
+            if (webhook && !webhook.includes("DIN_ANSØGNING")) {
+                const currentUrl = new URL(window.location.href);
+                const pathParts = currentUrl.pathname.split('/');
+                pathParts[pathParts.length - 1] = 'admin.html';
+                const adminUrl = currentUrl.origin + pathParts.join('/');
+
+                const discordData = {
+                    embeds: [{
+                        title: "Ny Ansøgning: " + job,
+                        description: `**[✅ GODKEND HER](${adminUrl}?status=GODKENDT&name=${encodeURIComponent(name)}&job=${encodeURIComponent(job)}&userId=${userId})** | **[❌ AFVIS HER](${adminUrl}?status=AFVIST&name=${encodeURIComponent(name)}&job=${encodeURIComponent(job)}&userId=${userId})**`,
+                        color: 3447003,
+                        fields: [
+                            { name: "Navn", value: name, inline: true },
+                            { name: "Alder", value: age, inline: true },
+                            { name: "Discord", value: discord, inline: true },
+                            { name: "Steam", value: steam, inline: true },
+                            { name: applicationData.field1.label, value: applicationData.field1.value },
+                            { name: applicationData.field2.label, value: applicationData.field2.value },
+                            { name: applicationData.field3.label, value: applicationData.field3.value },
+                            { name: applicationData.field5.label, value: applicationData.field5.value },
+                            { name: applicationData.field6.label, value: applicationData.field6.value }
+                        ],
+                        footer: { text: "Evolution RP Ansøgningssystem" },
+                        timestamp: new Date()
+                    }]
+                };
+
+                if (applicationData.field4) {
+                    discordData.embeds[0].fields.push({ name: applicationData.field4.label, value: applicationData.field4.value });
+                }
+
+                try {
+                    await fetch(webhook, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(discordData)
+                    });
+                } catch (err) { console.error("Discord webhook fejl:", err); }
+            }
+
+            alert("Ansøgning sendt succesfuldt!");
+            closeModal();
+            e.target.reset();
         };
 
         window.addEventListener('DOMContentLoaded', () => {

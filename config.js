@@ -7,14 +7,14 @@ const WebsiteConfig = {
     refreshInterval: 5000,      
     discordInvite: "https://discord.gg/FSSGVYsrhP", 
     
-    // DISCORD LOGIN SETUP
-    discordClientId: "1478767371593322546", 
-    redirectUri: "https://discord.com/oauth2/authorize?client_id=1478767371593322546&response_type=code&redirect_uri=https%3A%2F%2Fgithub.com%2FMasterfatduck%2FEvolutionRp.git&scope=identify+email", // F.eks. https://evolutionrp.dk/index.html
+    // SUPABASE CONFIGURATION
+    supabaseUrl: "https://hrtevidkppyybdcmyjiy.supabase.co",
+    supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhydGV2aWRrcHB5eWJkY215aml5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDAxMTksImV4cCI6MjA4ODIxNjExOX0.WRsaddoMlQomY0Ks62kE20HSGKblopv6O09-OlTNvpU",
 
     // DISCORD WEBHOOKS
     webhooks: {
-        applications: "https://discord.com/api/webhooks/1478770783005446291/ftX7lg6Uy23TIy4VwMLgSsDAEMThI1v0kpVSUJQtdkzlAn6nNsfFMXACXD00lFKN7Z5T", // Her lander nye ansøgninger
-        answers: "https://discord.com/api/webhooks/1478770207106269184/1kaJkNpHnivZAVXhz3sXoAxxvP0iz5yhb7SllLWVGEJBqIWoK8fwF23WQEx9-_EivJcP"            // Her lander svar (godkendt/afvist)
+        applications: "DIN_ANSØGNING_WEBHOOK", // Her lander nye ansøgninger
+        answers: "DIT_SVAR_WEBHOOK"            // Her lander svar (godkendt/afvist)
     },
 
     // STYR ANSØGNINGER HER (open / closed)
@@ -31,6 +31,31 @@ const WebsiteConfig = {
     donationLink: "DIT_TEBEX_LINK"
 };
 
+// --- Supabase Initialization ---
+let supabaseClient;
+try {
+    const lib = window.supabasejs || window.supabase;
+    if (lib && lib.createClient) {
+        supabaseClient = lib.createClient(WebsiteConfig.supabaseUrl, WebsiteConfig.supabaseAnonKey);
+        console.log("Supabase Client klar!");
+        
+        // Lytter efter ændringer i loginstatus (VIGTIGT for at opdatere UI efter login)
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            console.log("Auth event:", event);
+            if (session) {
+                checkUserSession();
+            } else {
+                localStorage.removeItem('evo_user_data');
+                // updateHeaderUI(null) kunne tilføjes her hvis nødvendigt
+            }
+        });
+    } else {
+        console.error("Supabase SDK ikke fundet! Tjek dine script-tags i HTML.");
+    }
+} catch (e) {
+    console.error("Fejl ved initialisering af Supabase:", e);
+}
+
 // --- CSS Fix (Tvinger menuen til at virke) ---
 const styleFix = document.createElement('style');
 styleFix.innerHTML = `
@@ -44,31 +69,110 @@ styleFix.innerHTML = `
 `;
 document.head.appendChild(styleFix);
 
-// --- Discord Login System ---
-async function handleDiscordLogin() {
-    const fragment = new URLSearchParams(window.location.hash.slice(1));
-    const accessToken = fragment.get('access_token');
-
-    if (accessToken) {
-        try {
-            const response = await fetch('https://discord.com/api/users/@me', {
-                headers: { Authorization: `Bearer ${accessToken}` }
-            });
-            const userData = await response.json();
-            
-            if (userData.id) {
-                const userObj = {
-                    id: String(userData.id), // Sikrer at det er en tekststreng
-                    name: userData.global_name || userData.username,
-                    avatar: userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png` : `https://ui-avatars.com/api/?name=${userData.username}`
-                };
-                localStorage.setItem('evo_user_data', JSON.stringify(userObj));
-                window.location.hash = "";
-                location.reload();
-            } else {
-                alert("Kunne ikke hente din Discord ID. Prøv igen.");
+// --- Discord Login System med Supabase ---
+async function loginWithDiscord() {
+    console.log("Forsøger login med Discord...");
+    if (!supabaseClient) {
+        alert("Supabase er ikke klar endnu. Prøv at genindlæse siden.");
+        return;
+    }
+    
+    try {
+        const { data, error } = await supabaseClient.auth.signInWithOAuth({
+            provider: 'discord',
+            options: {
+                redirectTo: window.location.origin + window.location.pathname
             }
-        } catch (e) { console.error("Login fejl:", e); }
+        });
+
+        if (error) {
+            console.error("Login fejl:", error.message);
+            alert("Login fejl: " + error.message);
+        } else if (data && data.url) {
+            console.log("Login URL modtaget, omdirigerer nu til:", data.url);
+            
+            // Vi prøver 3 forskellige metoder til at tvinge omdirigering
+            try {
+                window.location.assign(data.url);
+                
+                // Hvis den ikke er væk efter 300ms, prøv href
+                setTimeout(() => {
+                    if (window.location.href !== data.url) {
+                        window.location.href = data.url;
+                    }
+                }, 300);
+
+                // Sidste udvej: Åbn i ny fane hvis alt andet fejler efter 1 sekund
+                setTimeout(() => {
+                    if (window.location.href !== data.url) {
+                        console.warn("Standard omdirigering fejlede, prøver window.open...");
+                        window.open(data.url, '_blank');
+                    }
+                }, 1000);
+            } catch (err) {
+                console.error("Fejl ved omdirigering:", err);
+                window.open(data.url, '_blank');
+            }
+        }
+    } catch (e) {
+        console.error("Kritisk login fejl:", e);
+    }
+}
+
+async function handleLogout() {
+    if (!supabaseClient) return;
+    await supabaseClient.auth.signOut();
+    localStorage.removeItem('evo_user_data');
+    location.reload();
+}
+
+async function checkUserSession() {
+    if (!supabaseClient) return;
+
+    const { data: { session }, error } = await supabaseClient.auth.getSession();
+    
+    if (session && session.user) {
+        console.log("Bruger session fundet for:", session.user.email);
+        const meta = session.user.user_metadata;
+        const userData = {
+            id: meta.provider_id || session.user.id,
+            name: meta.full_name || meta.name || meta.display_name || meta.custom_claims?.global_name || session.user.email.split('@')[0],
+            avatar: meta.avatar_url || meta.picture || `https://ui-avatars.com/api/?name=${session.user.email}`
+        };
+        localStorage.setItem('evo_user_data', JSON.stringify(userData));
+        updateHeaderUI(userData);
+    } else {
+        localStorage.removeItem('evo_user_data');
+    }
+}
+
+function updateHeaderUI(userData) {
+    const headerActions = document.querySelector('.header-actions');
+    if (!headerActions) return;
+
+    // Find knappen mere robust (kigger efter indhold uanset ikoner)
+    const loginBtn = Array.from(headerActions.querySelectorAll('a, button')).find(el => {
+        const text = el.innerText.toUpperCase();
+        return text.includes("LOG IND") || text.includes("LOGIN") || el.classList.contains('btn-login');
+    });
+
+    if (loginBtn) {
+        console.log("Opdaterer UI for:", userData.name);
+        loginBtn.style.display = 'none';
+        
+        // Fjern gammel badge hvis den findes (for at undgå dubletter)
+        const oldBadge = headerActions.querySelector('.user-badge');
+        if (oldBadge) oldBadge.remove();
+
+        const badge = document.createElement('div');
+        badge.className = "user-badge";
+        badge.style.cssText = "display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.05); padding:6px 14px; border-radius:100px; border:1px solid var(--border); cursor:pointer; pointer-events:auto; z-index:2000000;";
+        badge.innerHTML = `
+            <img src="${userData.avatar}" style="width:28px; height:28px; border-radius:50%; border:2px solid var(--primary);">
+            <span style="font-weight:600; font-size:13px; color:white;">${userData.name}</span>
+            <i class="fas fa-sign-out-alt" style="font-size:12px; color:#ef4444; margin-left:5px;" onclick="handleLogout()"></i>
+        `;
+        headerActions.appendChild(badge);
     }
 }
 
@@ -76,21 +180,14 @@ function initLoginSystem() {
     document.addEventListener('click', (e) => {
         const btn = e.target.closest('a, button');
         if (btn) {
-            const text = btn.innerText.toUpperCase();
+            const text = btn.innerText.trim().toUpperCase();
+            console.log("KLIK registreret på element med tekst:", text);
+            
             if (text.includes("LOG IND") || text.includes("LOGIN")) {
+                console.log("Login-knap genkendt! Starter login-proces...");
                 e.preventDefault();
                 e.stopPropagation();
-
-                if (window.location.protocol === 'file:') {
-                    alert("STOP! Du skal køre siden gennem Live Server (højreklik på index.html -> Open with Live Server), ellers blokerer Discord for dit login!");
-                    return;
-                }
-
-                const scope = encodeURIComponent('identify');
-                const redirect = encodeURIComponent(WebsiteConfig.redirectUri);
-                const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${WebsiteConfig.discordClientId}&redirect_uri=${redirect}&response_type=token&scope=${scope}`;
-                
-                window.location.href = authUrl;
+                loginWithDiscord();
             }
         }
     }, true);
@@ -120,7 +217,9 @@ async function updateServerStats() {
                 playersEl.innerText = `${count}/64`;
                 return;
             }
-        } catch (e) {}
+        } catch (e) {
+            // Vi logger ikke fejlen for at undgå at fylde konsollen
+        }
     }
 
     if (playersEl.innerText === "Henter..." || playersEl.innerText === "OFFLINE") {
@@ -156,10 +255,22 @@ function initSharedSlideshow() {
     }
 }
 
-function applyGlobalConfig() {
+async function applyGlobalConfig() {
+    console.log("Initialiserer Evolution RP system...");
     try {
         initLoginSystem();
-        handleDiscordLogin();
+
+        // Hurtig UI opdatering fra cache (så profil ikke forsvinder ved sideskift)
+        const storedUser = localStorage.getItem('evo_user_data');
+        if (storedUser) {
+            try {
+                const userData = JSON.parse(storedUser);
+                updateHeaderUI(userData);
+            } catch (e) { localStorage.removeItem('evo_user_data'); }
+        }
+
+        // Bekræft session med Supabase i baggrunden
+        await checkUserSession();
 
         document.title = WebsiteConfig.serverName;
         document.querySelectorAll('.logo').forEach(el => {
@@ -171,40 +282,13 @@ function applyGlobalConfig() {
         updateServerStats();
         setInterval(updateServerStats, WebsiteConfig.refreshInterval);
 
-        const storedUser = localStorage.getItem('evo_user_data');
-        const headerActions = document.querySelector('.header-actions');
-        
-        if (storedUser && headerActions) {
-            const userData = JSON.parse(storedUser);
-            
-            // Hvis sessionen er gammel og mangler ID, så log ud automatisk
-            if (!userData.id) {
-                localStorage.removeItem('evo_user_data');
-                location.reload();
-                return;
-            }
-
-            const loginBtn = Array.from(headerActions.querySelectorAll('a')).find(a => a.innerText.trim().toUpperCase() === "LOG IND" || a.innerText.trim().toUpperCase() === "LOGIND");
-            
-            if (loginBtn) {
-                loginBtn.style.display = 'none';
-                const badge = document.createElement('div');
-                badge.style.cssText = "display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.05); padding:6px 14px; border-radius:100px; border:1px solid var(--border); cursor:pointer; pointer-events:auto; z-index:2000000;";
-                badge.innerHTML = `
-                    <img src="${userData.avatar}" style="width:28px; height:28px; border-radius:50%; border:2px solid var(--primary);">
-                    <span style="font-weight:600; font-size:13px; color:white;">${userData.name}</span>
-                    <i class="fas fa-sign-out-alt" style="font-size:12px; color:#ef4444; margin-left:5px;" onclick="localStorage.removeItem('evo_user_data'); location.reload();"></i>
-                `;
-                headerActions.appendChild(badge);
-            }
-        }
-
         document.querySelectorAll('a').forEach(a => {
             if (a.innerText.toUpperCase().includes("DISCORD")) a.href = WebsiteConfig.discordInvite;
             if (a.innerText.toUpperCase() === "SPIL NU") a.href = `fivem://connect/${WebsiteConfig.serverIp}`;
         });
+        console.log("System klar!");
 
-    } catch (e) { console.error("Config error", e); }
+    } catch (e) { console.error("Kritisk fejl under opstart:", e); }
 }
 
 window.addEventListener('DOMContentLoaded', applyGlobalConfig);

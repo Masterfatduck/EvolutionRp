@@ -10,6 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>window.supabasejs = supabase;</script>
     <script src="config.js"></script>
     <style>
         :root {
@@ -141,65 +144,76 @@
             const reason = document.getElementById('reason').value;
             const targetId = document.getElementById('targetUserId').value;
             
-            // Hent admin navn fra evo_user_data
+            // Hent admin data
             const storedUser = localStorage.getItem('evo_user_data');
             const userData = storedUser ? JSON.parse(storedUser) : null;
             const admin = userData ? userData.name : "Admin";
+            const adminId = userData ? userData.id : null;
 
             if (!name || !reason) {
                 alert("Udfyld venligst alle felter!");
                 return;
             }
 
-            if (!webhook || webhook.includes("DIN_SVAR")) {
-                alert("Svar-webhook er ikke sat op i config.js!");
-                return;
+            // 1. Opdater i Supabase (hvis vi har brugerens ID)
+            if (supabaseClient && targetId) {
+                try {
+                    const { error } = await supabaseClient
+                        .from('applications')
+                        .update({ 
+                            status: status, 
+                            admin_note: reason,
+                            handled_by: admin,
+                            handled_at: new Date()
+                        })
+                        .eq('user_id', targetId)
+                        .eq('job', job)
+                        .eq('status', 'PENDING');
+                    
+                    if (error) console.error("Supabase opdateringsfejl:", error);
+                } catch (err) { console.error("Kunne ikke opdatere Supabase:", err); }
             }
 
-            const color = status === 'GODKENDT' ? 3066993 : 15158332;
-            const icon = status === 'GODKENDT' ? "✅" : "❌";
+            // 2. Send til Discord Webhook
+            if (webhook && !webhook.includes("DIN_SVAR")) {
+                const color = status === 'GODKENDT' ? 3066993 : 15158332;
+                const icon = status === 'GODKENDT' ? "✅" : "❌";
 
-            const data = {
-                content: (targetId && targetId !== "" && targetId !== "undefined") ? `<@${targetId}>` : null, 
-                embeds: [{
-                    title: `${icon} Ansøgning ${status}`,
-                    color: color,
-                    fields: [
-                        { name: "Ansøger", value: name, inline: true },
-                        { name: "Stilling", value: job, inline: true },
-                        { name: "Status", value: status, inline: true },
-                        { name: "Besked fra Teamet", value: reason },
-                        { name: "Håndteret af", value: admin }
-                    ],
-                    footer: { text: "Evolution RP - Management" },
-                    timestamp: new Date()
-                }]
-            };
+                const data = {
+                    content: (targetId && targetId !== "" && targetId !== "undefined") ? `<@${targetId}>` : null, 
+                    embeds: [{
+                        title: `${icon} Ansøgning ${status}`,
+                        color: color,
+                        fields: [
+                            { name: "Ansøger", value: name, inline: true },
+                            { name: "Stilling", value: job, inline: true },
+                            { name: "Status", value: status, inline: true },
+                            { name: "Besked fra Teamet", value: reason },
+                            { name: "Håndteret af", value: admin }
+                        ],
+                        footer: { text: "Evolution RP - Management" },
+                        timestamp: new Date()
+                    }]
+                };
 
-            // Hvis administratoren ikke er logget ind, prøv at hente navnet fra localStorage direkte
-            if (admin === "Admin") {
-                const storedUser = localStorage.getItem('evo_user_data');
-                if (storedUser) {
-                    const userData = JSON.parse(storedUser);
-                    data.embeds[0].fields[4].value = userData.name;
+                try {
+                    const response = await fetch(webhook, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    if (response.ok) {
+                        alert(`Svaret er sendt! Ansøgeren er markeret som ${status}.`);
+                        document.getElementById('answerForm').reset();
+                    } else {
+                        alert("Fejl ved afsendelse til Discord.");
+                    }
+                } catch (err) {
+                    alert("Kunne ikke forbinde til Discord.");
                 }
-            }
-
-            try {
-                const response = await fetch(webhook, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-
-                if (response.ok) {
-                    alert(`Svaret er sendt! Ansøgeren er markeret som ${status}.`);
-                    document.getElementById('answerForm').reset();
-                } else {
-                    alert("Fejl ved afsendelse til Discord.");
-                }
-            } catch (err) {
-                alert("Kunne ikke forbinde til Discord.");
+            } else {
+                alert(`Supabase opdateret (hvis muligt), men ingen Discord webhook fundet.`);
             }
         }
     </script>
