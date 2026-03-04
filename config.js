@@ -9,7 +9,7 @@ const WebsiteConfig = {
     
     // DISCORD LOGIN SETUP
     discordClientId: "1478767371593322546", 
-    redirectUri: "https://discord.com/oauth2/authorize?client_id=1478767371593322546&response_type=code&redirect_uri=https%3A%2F%2Fevolutionrp1.netlify.app&scope=identify+email", // F.eks. https://evolutionrp.dk/index.html
+    redirectUri: "https://discord.com/oauth2/authorize?client_id=1478767371593322546&response_type=code&redirect_uri=https%3A%2F%2Fgithub.com%2FMasterfatduck%2FEvolutionRp.git&scope=identify+email", // F.eks. https://evolutionrp.dk/index.html
 
     // DISCORD WEBHOOKS
     webhooks: {
