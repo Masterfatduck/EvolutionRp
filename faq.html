@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ | Evolution RP</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="config.js"></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.2);
+            --bg: #030712;
+            --card: rgba(17, 24, 39, 0.4);
+            --border: rgba(255, 255, 255, 0.06);
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .page-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.2s ease-in-out;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        .page-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(3, 7, 18, 0.3), rgba(3, 7, 18, 0.9) 90%);
+            pointer-events: none;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1400px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 40px;
+            background: rgba(3, 7, 18, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            z-index: 9999;
+            pointer-events: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .logo span { color: var(--primary); }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-dim);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        nav ul li a:hover { color: var(--text); }
+        nav ul li a.active { color: var(--primary); }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            box-shadow: 0 10px 20px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px var(--primary-glow);
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 180px 5% 100px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 80px;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -0.04em;
+        }
+
+        .page-header p {
+            color: var(--text-dim);
+            font-size: 1.25rem;
+        }
+
+        .faq-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .faq-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .faq-question i {
+            color: var(--primary);
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            padding: 0 32px;
+            color: var(--text-dim);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            padding-bottom: 24px;
+        }
+
+        footer {
+            padding: 100px 5% 40px;
+            background: rgba(2, 6, 23, 0.7);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 100px;
+            max-width: 1400px;
+            margin: 0 auto 80px;
+        }
+
+        .footer-info p {
+            color: var(--text-dim);
+            margin-top: 24px;
+            max-width: 320px;
+            font-size: 0.95rem;
+        }
+
+        .footer-col h5 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 32px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 16px;
+        }
+
+        .footer-col ul li a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .footer-col ul li a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+            max-width: 1400px;
+            margin: 0 auto;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        .social { display: flex; gap: 24px; }
+        .social a { 
+            color: var(--text-dim); 
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .social a:hover { color: var(--text); }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            nav { display: none; }
+            .page-header h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-bg">
+        <div class="slide active" style="background-image: url('img/bg1.jpg')"></div>
+        <div class="slide" style="background-image: url('img/bg2.jpg')"></div>
+        <div class="slide" style="background-image: url('img/bg3.jpg')"></div>
+        <div class="slide" style="background-image: url('img/bg4.jpg')"></div>
+        <div class="slide" style="background-image: url('img/bg5.jpg')"></div>
+        <div class="slide" style="background-image: url('img/bg6.jpg')"></div>
+    </div>
+
+    <header>
+        <a href="index.html" class="logo">
+            <i class="fas fa-rocket"></i>
+            EVOLUTION<span>RP</span>
+        </a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Hjem</a></li>
+                <li><a href="regler.html">Regler</a></li>
+                <li><a href="faq.html" class="active">FAQ</a></li>
+                <li><a href="donation.html">Donation</a></li>
+                <li><a href="ansøninger.html">Ansøgninger</a></li>
+            </ul>
+        </nav>
+        <div class="header-actions">
+            <a href="#" class="btn btn-outline">
+                <i class="fab fa-discord"></i> Discord
+            </a>
+            <a href="#" class="btn btn-primary">Log ind</a>
+        </div>
+    </header>
+
+    <main class="content">
+        <div class="page-header reveal">
+            <h1>FAQ</h1>
+            <p>Find hurtigt svar på de mest stillede spørgsmål her.</p>
+        </div>
+
+        <div class="faq-container">
+            <div class="faq-item reveal">
+                <div class="faq-question">
+                    Hvordan joiner jeg serveren?
+                    <i data-lucide="chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Søg efter "Evolution RP" i FiveM serverlisten eller brug direkte forbindelse via F8 terminalen med vores IP.
+                </div>
+            </div>
+
+            <div class="faq-item reveal" style="transition-delay: 0.1s;">
+                <div class="faq-question">
+                    Hvor finder jeg log-filer og regler?
+                    <i data-lucide="chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Alle regler er tilgængelige her på siden under "Regler", og yderligere information kan findes i vores Discord.
+                </div>
+            </div>
+
+            <div class="faq-item reveal" style="transition-delay: 0.3s;">
+                <div class="faq-question">
+                    Hvad er Evolution RP?
+                    <i data-lucide="chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Evolution RP er en dansk FiveM server med fokus på seriøs og realistisk roleplay. Vi stræber efter at skabe den bedste oplevelse for vores spillere gennem innovation og teknisk overlegenhed.
+                </div>
+            </div>
+
+            <div class="faq-item reveal" style="transition-delay: 0.4s;">
+                <div class="faq-question">
+                    Hvordan ansøger jeg om job (Politi/EMS)?
+                    <i data-lucide="chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Du kan ansøge direkte her på hjemmesiden under fanen "Ansøgninger". Vores team vil derefter gennemgå din ansøgning og kontakte dig via Discord.
+                </div>
+            </div>
+
+            <div class="faq-item reveal" style="transition-delay: 0.5s;">
+                <div class="faq-question">
+                    Hvad er Whitelist, og hvordan får jeg det?
+                    <i data-lucide="chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Whitelist er en godkendelse, der kræves for at spille på serveren. Du kan ansøge om whitelist under "Ansøgninger", hvor du skal besvare spørgsmål om regler og din karakter.
+                </div>
+            </div>
+
+            <div class="faq-item reveal" style="transition-delay: 0.6s;">
+                <div class="faq-question">
+                    Hvordan donerer jeg til serveren?
+                    <i data-lucide="chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Du kan støtte serveren og købe unikke ting under "Donation" fanen, som videresender dig til vores Tebex-shop. Al støtte går ubeskåret til serverens drift og udvikling.
+                </div>
+            </div>
+
+            <div class="faq-item reveal" style="transition-delay: 0.7s;">
+                <div class="faq-question">
+                    Hvilke regler gælder for CK og PK?
+                    <i data-lucide="chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    CK (Character Kill) kræver en godkendt ansøgning og en meget stærk RP-grund. PK (Player Kill) sker ved død i en situation, hvor man glemmer alt fra den specifikke hændelse. Læs mere under "Regler".
+                </div>
+            </div>
+
+            <div class="faq-item reveal" style="transition-delay: 0.8s;">
+                <div class="faq-question">
+                    Kræves der mikrofon for at spille?
+                    <i data-lucide="chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Ja, en fungerende mikrofon af god kvalitet er et absolut krav for at spille på Evolution RP, da al kommunikation foregår via voice-chat.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-info">
+                <a href="index.html" class="logo">
+                    <i class="fas fa-rocket"></i>
+                    EVOLUTION<span>RP</span>
+                </a>
+                <p>Danmarks mest innovative FiveM fællesskab. Bygget af spillere, for spillere.</p>
+            </div>
+            <div class="footer-col">
+                <h5>Navigation</h5>
+                <ul>
+                    <li><a href="index.html">Hjem</a></li>
+                    <li><a href="regler.html">Regler</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h5>Community</h5>
+                <ul>
+                    <li><a href="#">Discord</a></li>
+                    <li><a href="donation.html">Donation</a></li>
+                    <li><a href="ansøninger.html">Ansøgning</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>&copy; 2026 Evolution RP. Alle rettigheder forbeholdes.</div>
+            <div class="social">
+                <a href="#">DISCORD</a>
+                <a href="#">INSTAGRAM</a>
+                <a href="#">YOUTUBE</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        document.querySelectorAll('.faq-question').forEach(q => {
+            q.addEventListener('click', () => {
+                const item = q.parentElement;
+                item.classList.toggle('active');
+            });
+        });
+        // applyGlobalConfig() runs automatically via config.js EventListener
+    </script>
+</body>
+</html>

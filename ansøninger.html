@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ansøgninger | Evolution RP</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="config.js"></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.2);
+            --bg: #030712;
+            --card: rgba(17, 24, 39, 0.4);
+            --border: rgba(255, 255, 255, 0.06);
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg); color: var(--text); overflow-x: hidden; line-height: 1.6; }
+
+        .page-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
+        .page-bg::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(3, 7, 18, 0.3), rgba(3, 7, 18, 0.9) 90%); }
+        .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.2s ease-in-out; }
+        .slide.active { opacity: 1; }
+
+        header { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 1400px; display: flex; justify-content: space-between; align-items: center; padding: 16px 40px; background: rgba(3, 7, 18, 0.4); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 100px; z-index: 9999; pointer-events: auto; }
+        .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); font-weight: 800; font-size: 1.1rem; letter-spacing: 1px; text-transform: uppercase; }
+        .logo span { color: var(--primary); }
+        nav ul { display: flex; list-style: none; gap: 32px; }
+        nav ul li a { text-decoration: none; color: var(--text-dim); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        nav ul li a:hover { color: var(--text); }
+        nav ul li a.active { color: var(--primary); }
+
+        .btn { padding: 12px 28px; border-radius: 100px; font-weight: 700; font-size: 0.8rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; text-transform: uppercase; transition: all 0.3s; }
+        .btn-primary { background: var(--primary); color: white; border: none; box-shadow: 0 10px 20px var(--primary-glow); }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 30px var(--primary-glow); }
+        .btn-outline { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); color: var(--text); }
+        .btn-outline:hover { background: rgba(255, 255, 255, 0.08); transform: translateY(-2px); }
+
+        .content { padding: 180px 5% 100px; max-width: 1200px; margin: 0 auto; }
+        .page-header { margin-bottom: 80px; text-align: center; }
+        .page-header h1 { font-size: 3.5rem; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.04em; }
+        .page-header p { color: var(--text-dim); font-size: 1.25rem; }
+
+        .apply-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px; }
+        .apply-card { background: var(--card); border: 1px solid var(--border); padding: 40px; border-radius: 32px; display: flex; flex-direction: column; gap: 20px; transition: 0.3s; position: relative; z-index: 10; pointer-events: auto; }
+        .apply-card:hover { transform: translateY(-10px); border-color: var(--primary); }
+
+        .status-pill { padding: 4px 12px; border-radius: 100px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; width: fit-content; }
+        .status-open { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .status-closed { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .btn-disabled { background: rgba(255, 255, 255, 0.05) !important; color: var(--text-dim) !important; cursor: not-allowed !important; pointer-events: none !important; box-shadow: none !important; transform: none !important; }
+
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(3, 7, 18, 0.95); backdrop-filter: blur(10px); z-index: 2000000 !important; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal.active { display: flex; }
+        .modal-content { background: #0f172a; border: 1px solid var(--border); padding: 40px; border-radius: 32px; width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; position: relative; }
+        .close-modal { position: absolute; top: 24px; right: 24px; color: var(--text-dim); cursor: pointer; font-size: 1.5rem; }
+
+        .form-group { margin-bottom: 24px; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); padding: 14px 20px; border-radius: 12px; color: #fff; font-size: 1rem; outline: none; }
+        .form-group textarea { height: 120px; resize: none; }
+        .form-group input:focus, .form-group textarea:focus { border-color: var(--primary); }
+        .btn-full { width: 100%; justify-content: center; }
+
+        .reveal { opacity: 0; transform: translateY(20px); transition: all 0.6s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+    <div class="page-bg">
+        <div class="slide active" style="background-image: url('img/bg1.jpg')"></div>
+    </div>
+
+    <header>
+        <a href="index.html" class="logo">EVOLUTION<span>RP</span></a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Hjem</a></li>
+                <li><a href="regler.html">Regler</a></li>
+                <li><a href="faq.html">FAQ</a></li>
+                <li><a href="donation.html">Donation</a></li>
+                <li><a href="ansøninger.html" class="active">Ansøgninger</a></li>
+            </ul>
+        </nav>
+        <div class="header-actions">
+            <a href="#" class="btn btn-outline"><i class="fab fa-discord"></i> Discord</a>
+            <a href="#" class="btn btn-primary btn-login">Log ind</a>
+        </div>
+    </header>
+
+    <div id="applyModal" class="modal">
+        <div class="modal-content">
+            <i class="fas fa-times close-modal" onclick="closeModal()"></i>
+            <h2 id="modalTitle" style="margin-bottom: 32px;">Ansøg som Betjent</h2>
+            <form id="applyForm">
+                <input type="hidden" id="jobType">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group"><label>Fulde Navn (OOC)</label><input type="text" id="name" required></div>
+                    <div class="form-group"><label>Alder (OOC)</label><input type="number" id="age" required></div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group"><label>Discord Navn</label><input type="text" id="discord" required></div>
+                    <div class="form-group"><label>Steam Navn</label><input type="text" id="steam" required></div>
+                </div>
+
+                <!-- Dynamiske felter baseret på type -->
+                <div id="dynamicFields">
+                    <div class="form-group"><label id="label1">Hvor mange timer har du i FiveM?</label><input type="text" id="field1" required></div>
+                    <div class="form-group"><label id="label2">Tidligere erfaring</label><textarea id="field2" required placeholder="Beskriv din tidligere erfaring i detaljer..."></textarea></div>
+                    <div class="form-group"><label id="label3">Hvorfor skal vi vælge netop dig?</label><textarea id="field3" required placeholder="Hvad gør dig unik?"></textarea></div>
+                    <div class="form-group"><label id="label5">Hvad kan du bidrage med til communityet?</label><textarea id="field5" required placeholder="Beskriv dine planer og mål..."></textarea></div>
+                    <div class="form-group"><label id="label6">Kendskab til regler (1-10)</label><input type="text" id="field6" required placeholder="Hvor godt kender du vores regelsæt?"></div>
+                    <div class="form-group" id="group4"><label id="label4">Ugentlig tid</label><input type="text" id="field4" required placeholder="f.eks. 15-20 timer"></div>
+                </div>
+
+                <div style="display: flex; gap: 16px; margin-top: 24px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 2; justify-content: center;">Indsend Ansøgning</button>
+                    <button type="button" onclick="closeModal()" class="btn btn-outline" style="flex: 1; justify-content: center;">Annuller</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <main class="content">
+        <div class="page-header reveal">
+            <h1>Ansøgninger</h1>
+            <p>Vi søger engagerede spillere til vores etat og team.</p>
+        </div>
+
+        <div class="apply-grid">
+            <div class="apply-card reveal" data-type="police">
+                <div class="status-pill"></div>
+                <h3>Politi</h3>
+                <p>Beskyt staten. Vi kræver seriøsitet, engagement og god radio-disciplin.</p>
+                <button onclick="openApply('Politi')" class="btn btn-primary btn-full">Ansøg Nu</button>
+            </div>
+            <div class="apply-card reveal" data-type="ems">
+                <div class="status-pill"></div>
+                <h3>Læge (EMS)</h3>
+                <p>Red liv i staten. Vi søger dedikerede reddere der kan håndtere stressede situationer.</p>
+                <button onclick="openApply('EMS')" class="btn btn-primary btn-full">Ansøg Nu</button>
+            </div>
+            <div class="apply-card reveal" data-type="staff">
+                <div class="status-pill"></div>
+                <h3>Staff Team</h3>
+                <p>Hjælp med at drive communityet. Søg hvis du er moden og har lyst til at hjælpe andre.</p>
+                <button onclick="openApply('Staff')" class="btn btn-primary btn-full">Ansøg Nu</button>
+            </div>
+            <div class="apply-card reveal" data-type="whitelist">
+                <div class="status-pill"></div>
+                <h3>Whitelist</h3>
+                <p>Bliv en del af vores community. Ansøg her for at få adgang til serveren.</p>
+                <button onclick="openApply('Whitelist')" class="btn btn-primary btn-full">Ansøg Nu</button>
+            </div>
+            <div class="apply-card reveal" data-type="ck">
+                <div class="status-pill"></div>
+                <h3>CK Ansøgning</h3>
+                <p>Planlægger du et Character Kill? Ansøg her med din dybdegående plan.</p>
+                <button onclick="openApply('CK')" class="btn btn-primary btn-full">Ansøg Nu</button>
+            </div>
+            <div class="apply-card reveal" data-type="pk">
+                <div class="status-pill"></div>
+                <h3>PK Ansøgning</h3>
+                <p>Er du blevet Player Killed? Ansøg her for at få din karakter tilbage eller klage over PK'et.</p>
+                <button onclick="openApply('PK')" class="btn btn-primary btn-full">Ansøg Nu</button>
+            </div>
+            <div class="apply-card reveal" data-type="unban">
+                <div class="status-pill"></div>
+                <h3>Unban</h3>
+                <p>Er du blevet banned fra serveren? Send din unban-ansøgning her.</p>
+                <button onclick="openApply('Unban')" class="btn btn-primary btn-full">Ansøg Nu</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function openApply(type) {
+            document.getElementById('jobType').value = type;
+            document.getElementById('modalTitle').innerText = 'Ansøg som ' + type;
+            
+            // Standard labels
+            let l1 = "FiveM Timer", l2 = "Erfaring", l3 = "Motivation", l4 = "Ugentlig Tid", l5 = "Bidrag", l6 = "Regelkendskab";
+            document.getElementById('group4').style.display = 'block';
+            document.getElementById('field5').parentElement.style.display = 'block';
+            document.getElementById('field6').parentElement.style.display = 'block';
+
+            if (type === 'CK') {
+                l1 = "Hvem skal CK'es? (ID/Navn)";
+                l2 = "Hvad er grunden til dette CK?";
+                l3 = "Beskriv din udførelsesplan i detaljer";
+                l4 = "Hvad forventer du af modparten?";
+                l5 = "Hvad er konsekvenserne hvis det fejler?";
+                l6 = "Har du clearet det med Staff?";
+            } else if (type === 'PK') {
+                l1 = "Hvornår skete det?";
+                l2 = "Beskriv situationen";
+                l3 = "Hvorfor mener du at PK'et er ugyldigt?";
+                document.getElementById('group4').style.display = 'none';
+                document.getElementById('field5').parentElement.style.display = 'none';
+                document.getElementById('field6').parentElement.style.display = 'none';
+            } else if (type === 'Unban') {
+                l1 = "Hvorfor blev du banned?";
+                l2 = "Hvad har du lært af din straf?";
+                l3 = "Hvorfor skal vi give dig en chance til?";
+                l5 = "Hvad vil du gøre anderledes fremover?";
+                l6 = "Dit SteamID / License";
+                document.getElementById('group4').style.display = 'none';
+            } else if (type === 'Whitelist') {
+                l1 = "Har du læst reglerne?";
+                l2 = "Beskriv din karakter og hans historie";
+                l3 = "Hvad vil du bidrage med til serveren?";
+                l5 = "Nævn 3 vigtige regler";
+                l6 = "Hvad er din karakters svagheder?";
+                document.getElementById('group4').style.display = 'none';
+            }
+
+            document.getElementById('label1').innerText = l1;
+            document.getElementById('label2').innerText = l2;
+            document.getElementById('label3').innerText = l3;
+            document.getElementById('label4').innerText = l4;
+            document.getElementById('label5').innerText = l5;
+            document.getElementById('label6').innerText = l6;
+
+            const storedUser = localStorage.getItem('evo_user_data');
+            if (storedUser) {
+                const userData = JSON.parse(storedUser);
+                document.getElementById('discord').value = userData.name;
+            }
+            document.getElementById('applyModal').classList.add('active');
+        }
+        function closeModal() { document.getElementById('applyModal').classList.remove('active'); }
+
+        // Luk ved klik udenfor
+        window.onclick = function(event) {
+            const modal = document.getElementById('applyModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // --- Opdater status på kort fra Config ---
+        function updateApplicationStatuses() {
+            const config = WebsiteConfig.applications;
+            document.querySelectorAll('.apply-card').forEach(card => {
+                const type = card.getAttribute('data-type');
+                const status = config[type];
+                const pill = card.querySelector('.status-pill');
+                const btn = card.querySelector('button');
+
+                if (status === 'open') {
+                    pill.innerText = 'Åben';
+                    pill.className = 'status-pill status-open';
+                    btn.classList.remove('btn-disabled');
+                    btn.innerText = 'Ansøg Nu';
+                } else {
+                    pill.innerText = 'Lukket';
+                    pill.className = 'status-pill status-closed';
+                    btn.classList.add('btn-disabled');
+                    btn.innerText = 'Lukket';
+                }
+            });
+        }
+
+        // Kør ved load
+        window.addEventListener('DOMContentLoaded', updateApplicationStatuses);
+
+        document.getElementById('applyForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const webhook = WebsiteConfig.webhooks.applications;
+            if (!webhook || webhook.includes("DIN_ANSØGNING")) {
+                alert("Webhook er ikke sat op i config.js endnu!");
+                return;
+            }
+
+            const currentUrl = new URL(window.location.href);
+            const pathParts = currentUrl.pathname.split('/');
+            pathParts[pathParts.length - 1] = 'admin.html';
+            const adminUrl = currentUrl.origin + pathParts.join('/');
+            
+            const name = document.getElementById('name').value;
+            const job = document.getElementById('jobType').value;
+            
+            const storedUser = localStorage.getItem('evo_user_data');
+            const userData = storedUser ? JSON.parse(storedUser) : null;
+            const userId = userData ? userData.id : "";
+
+            if (!userId) {
+                if (!confirm("Du er ikke logget ind! Du vil ikke kunne blive tagget direkte i Discord, når vi svarer på din ansøgning. Vil du fortsætte alligevel?")) {
+                    return;
+                }
+            }
+
+            const data = {
+                embeds: [{
+                    title: "Ny Ansøgning: " + job,
+                    description: `**[✅ GODKEND HER](${adminUrl}?status=GODKENDT&name=${encodeURIComponent(name)}&job=${encodeURIComponent(job)}&userId=${userId})** | **[❌ AFVIS HER](${adminUrl}?status=AFVIST&name=${encodeURIComponent(name)}&job=${encodeURIComponent(job)}&userId=${userId})**`,
+                    color: 3447003,
+                    fields: [
+                        { name: "Navn", value: name, inline: true },
+                        { name: "Alder", value: document.getElementById('age').value, inline: true },
+                        { name: "Discord", value: document.getElementById('discord').value, inline: true },
+                        { name: "Steam", value: document.getElementById('steam').value, inline: true },
+                        { name: document.getElementById('label1').innerText, value: document.getElementById('field1').value },
+                        { name: document.getElementById('label2').innerText, value: document.getElementById('field2').value },
+                        { name: document.getElementById('label3').innerText, value: document.getElementById('field3').value },
+                        { name: document.getElementById('label5').innerText, value: document.getElementById('field5').value },
+                        { name: document.getElementById('label6').innerText, value: document.getElementById('field6').value }
+                    ],
+                    footer: { text: "Evolution RP Ansøgningssystem" },
+                    timestamp: new Date()
+                }]
+            };
+
+            if (document.getElementById('group4').style.display !== 'none') {
+                data.embeds[0].fields.push({ name: document.getElementById('label4').innerText, value: document.getElementById('field4').value });
+            }
+
+            try {
+                const response = await fetch(webhook, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (response.ok) {
+                    alert("Ansøgning sendt succesfuldt!");
+                    closeModal();
+                    e.target.reset();
+                } else { alert("Fejl ved afsendelse. Tjek din webhook."); }
+            } catch (err) { alert("Kunne ikke forbinde til Discord."); }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        });
+    </script>
+    <footer style="padding: 60px 5% 40px; border-top: 1px solid var(--border); margin-top: 80px;">
+        <div style="max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; color: var(--text-dim); font-size: 0.9rem;">
+            <div>&copy; 2026 Evolution RP. Powered by <a href="https://discord.gg/Ee6CkAtrYM" target="_blank" style="color:var(--primary); text-decoration:none;"><strong>Suko Shop</strong></a>.</div>
+            <div style="display: flex; gap: 24px;">
+                <a href="index.html" style="color: var(--text-dim); text-decoration: none;">Hjem</a>
+                <a href="regler.html" style="color: var(--text-dim); text-decoration: none;">Regler</a>
+                <a href="faq.html" style="color: var(--text-dim); text-decoration: none;">FAQ</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

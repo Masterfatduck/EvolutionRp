@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Evolution RP</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="config.js"></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg: #030712;
+            --card: rgba(17, 24, 39, 0.6);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg); color: var(--text); overflow-x: hidden; line-height: 1.6; }
+
+        .page-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(to bottom, rgba(3, 7, 18, 0.8), rgba(3, 7, 18, 0.95)), url('img/bg1.jpg'); background-size: cover; }
+
+        .container { max-width: 800px; margin: 60px auto; padding: 0 20px; }
+        .admin-card { background: var(--card); border: 1px solid var(--border); border-radius: 40px; padding: 50px; backdrop-filter: blur(30px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+        
+        .admin-header { text-align: center; margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 30px; }
+        .logo { justify-content: center; margin-bottom: 20px; font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 12px; }
+        
+        h1 { font-size: 2.2rem; margin-bottom: 8px; font-weight: 800; letter-spacing: -0.02em; }
+        p.subtitle { color: var(--text-dim); }
+
+        .form-group { margin-bottom: 24px; }
+        .form-group label { display: block; margin-bottom: 10px; font-size: 0.75rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); padding: 16px 20px; border-radius: 16px; color: #fff; font-size: 1rem; outline: none; transition: 0.3s; }
+        .form-group select option { background: #0f172a; color: white; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--primary); background: rgba(255, 255, 255, 0.05); }
+        .form-group textarea { height: 140px; resize: none; }
+
+        .action-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 40px; }
+        .btn { padding: 20px; border-radius: 100px; border: none; font-weight: 800; font-size: 0.95rem; cursor: pointer; text-transform: uppercase; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 12px; color: #fff; }
+        
+        .btn-success { background: var(--success); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2); }
+        .btn-success:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3); }
+        
+        .btn-danger { background: var(--danger); box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2); }
+        .btn-danger:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(239, 68, 68, 0.3); }
+
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--text-dim); text-decoration: none; margin-bottom: 24px; font-size: 0.9rem; font-weight: 600; transition: 0.3s; }
+        .back-link:hover { color: #fff; transform: translateX(-5px); }
+    </style>
+</head>
+<body>
+    <div class="page-bg"></div>
+
+    <div class="container">
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Tilbage til forsiden</a>
+        
+        <div class="admin-card">
+            <div class="admin-header">
+                <div class="logo"></div> <!-- Logo injiceres her fra config.js -->
+                <h1>Svar på Ansøgning</h1>
+                <p class="subtitle">Brug dette panel til at sende svar til ansøgere.</p>
+            </div>
+
+            <form id="answerForm">
+                <input type="hidden" id="targetUserId">
+                
+                <div class="form-group">
+                    <label>Ansøgers Navn</label>
+                    <input type="text" id="targetName" placeholder="f.eks. Liam Kurstain" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Stilling</label>
+                    <select id="jobType">
+                        <option value="Politi">Politi</option>
+                        <option value="Læge (EMS)">Læge (EMS)</option>
+                        <option value="Staff Team">Staff Team</option>
+                        <option value="Whitelist">Whitelist</option>
+                        <option value="CK">CK</option>
+                        <option value="PK">PK</option>
+                        <option value="Unban">Unban</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Begrundelse / Svarbesked</label>
+                    <textarea id="reason" placeholder="Skriv dit svar til ansøgeren her..." required></textarea>
+                </div>
+
+                <div class="action-btns">
+                    <button type="button" onclick="sendResponse('GODKENDT')" class="btn btn-success">
+                        <i class="fas fa-check-circle"></i> Godkend
+                    </button>
+                    <button type="button" onclick="sendResponse('AFVIST')" class="btn btn-danger">
+                        <i class="fas fa-times-circle"></i> Afvis
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const defaultMessages = {
+            'GODKENDT': "Din ansøgning er hermed godkendt! Vi vil gerne invitere dig til en samtale på vores Discord.",
+            'AFVIST': "Din ansøgning er desværre blevet afvist denne gang. Du er velkommen til at søge igen senere."
+        };
+
+        // Læs data fra URL (når man klikker i Discord)
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('name')) document.getElementById('targetName').value = params.get('name');
+            if (params.has('job')) document.getElementById('jobType').value = params.get('job');
+            if (params.has('userId')) document.getElementById('targetUserId').value = params.get('userId');
+            
+            if (params.has('status')) {
+                const status = params.get('status');
+                document.getElementById('reason').value = defaultMessages[status] || defaultMessages['AFVIST'];
+            }
+        });
+
+        async function sendResponse(status) {
+            // Opdater beskedfeltet hvis det stadig er standardbeskeden fra en anden status
+            const currentMsg = document.getElementById('reason').value;
+            const otherStatus = status === 'GODKENDT' ? 'AFVIST' : 'GODKENDT';
+            if (currentMsg === defaultMessages[otherStatus]) {
+                document.getElementById('reason').value = defaultMessages[status];
+            }
+
+            const webhook = WebsiteConfig.webhooks.answers;
+            const name = document.getElementById('targetName').value;
+            const job = document.getElementById('jobType').value;
+            const reason = document.getElementById('reason').value;
+            const targetId = document.getElementById('targetUserId').value;
+            
+            // Hent admin navn fra evo_user_data
+            const storedUser = localStorage.getItem('evo_user_data');
+            const userData = storedUser ? JSON.parse(storedUser) : null;
+            const admin = userData ? userData.name : "Admin";
+
+            if (!name || !reason) {
+                alert("Udfyld venligst alle felter!");
+                return;
+            }
+
+            if (!webhook || webhook.includes("DIN_SVAR")) {
+                alert("Svar-webhook er ikke sat op i config.js!");
+                return;
+            }
+
+            const color = status === 'GODKENDT' ? 3066993 : 15158332;
+            const icon = status === 'GODKENDT' ? "✅" : "❌";
+
+            const data = {
+                content: (targetId && targetId !== "" && targetId !== "undefined") ? `<@${targetId}>` : null, 
+                embeds: [{
+                    title: `${icon} Ansøgning ${status}`,
+                    color: color,
+                    fields: [
+                        { name: "Ansøger", value: name, inline: true },
+                        { name: "Stilling", value: job, inline: true },
+                        { name: "Status", value: status, inline: true },
+                        { name: "Besked fra Teamet", value: reason },
+                        { name: "Håndteret af", value: admin }
+                    ],
+                    footer: { text: "Evolution RP - Management" },
+                    timestamp: new Date()
+                }]
+            };
+
+            // Hvis administratoren ikke er logget ind, prøv at hente navnet fra localStorage direkte
+            if (admin === "Admin") {
+                const storedUser = localStorage.getItem('evo_user_data');
+                if (storedUser) {
+                    const userData = JSON.parse(storedUser);
+                    data.embeds[0].fields[4].value = userData.name;
+                }
+            }
+
+            try {
+                const response = await fetch(webhook, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert(`Svaret er sendt! Ansøgeren er markeret som ${status}.`);
+                    document.getElementById('answerForm').reset();
+                } else {
+                    alert("Fejl ved afsendelse til Discord.");
+                }
+            } catch (err) {
+                alert("Kunne ikke forbinde til Discord.");
+            }
+        }
+    </script>
+</body>
+</html>

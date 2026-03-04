@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regler | Evolution RP</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="config.js"></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.2);
+            --bg: #030712;
+            --card: rgba(17, 24, 39, 0.4);
+            --border: rgba(255, 255, 255, 0.06);
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .page-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.2s ease-in-out;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        .page-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(3, 7, 18, 0.3), rgba(3, 7, 18, 0.9) 90%);
+            pointer-events: none;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1400px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 40px;
+            background: rgba(3, 7, 18, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            z-index: 9999;
+            pointer-events: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .logo span { color: var(--primary); }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-dim);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        nav ul li a:hover { color: var(--text); }
+        nav ul li a.active { color: var(--primary); }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            box-shadow: 0 10px 20px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px var(--primary-glow);
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 180px 5% 100px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 80px;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -0.04em;
+        }
+
+        .page-header p {
+            color: var(--text-dim);
+            font-size: 1.25rem;
+        }
+
+        .rules-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .rule-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 24px;
+        }
+
+        .rule-item h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .rule-item h3 span {
+            color: var(--primary);
+            opacity: 0.5;
+            font-weight: 900;
+        }
+
+        .rule-item p {
+            color: var(--text-dim);
+            margin-bottom: 24px;
+        }
+
+        .rule-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            list-style: none;
+        }
+
+        .rule-list li {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 16px 24px;
+            border-radius: 16px;
+            font-size: 0.95rem;
+            display: block;
+            border: 1px solid var(--border);
+            transition: 0.3s;
+        }
+
+        .rule-list li:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .rule-list li b {
+            color: var(--primary);
+            display: block;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .rule-list li::before {
+            display: none;
+        }
+
+        footer {
+            padding: 100px 5% 40px;
+            background: rgba(2, 6, 23, 0.7);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 100px;
+            max-width: 1400px;
+            margin: 0 auto 80px;
+        }
+
+        .footer-info p {
+            color: var(--text-dim);
+            margin-top: 24px;
+            max-width: 320px;
+            font-size: 0.95rem;
+        }
+
+        .footer-col h5 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 32px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 16px;
+        }
+
+        .footer-col ul li a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .footer-col ul li a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+            max-width: 1400px;
+            margin: 0 auto;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        .social { display: flex; gap: 24px; }
+        .social a { 
+            color: var(--text-dim); 
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .social a:hover { color: var(--text); }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            nav { display: none; }
+            .page-header h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-bg">
+        <div class="slide active" style="background-image: url('img/bg1.jpg')"></div>
+        <div class="slide" style="background-image: url('img/bg2.jpg')"></div>
+        <div class="slide" style="background-image: url('img/bg3.jpg')"></div>
+        <div class="slide" style="background-image: url('img/bg4.jpg')"></div>
+        <div class="slide" style="background-image: url('img/bg5.jpg')"></div>
+        <div class="slide" style="background-image: url('img/bg6.jpg')"></div>
+    </div>
+
+    <header>
+        <a href="index.html" class="logo">
+            <img src="img/logo.png" style="height:35px; filter:drop-shadow(0 0 10px rgba(59,130,246,0.5));">
+            EVOLUTION<span>RP</span>
+        </a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Hjem</a></li>
+                <li><a href="regler.html" class="active">Regler</a></li>
+                <li><a href="faq.html">FAQ</a></li>
+                <li><a href="donation.html">Donation</a></li>
+                <li><a href="ansøninger.html">Ansøgninger</a></li>
+            </ul>
+        </nav>
+        <div class="header-actions">
+            <a href="#" class="btn btn-outline">
+                <i class="fab fa-discord"></i> Discord
+            </a>
+            <a href="#" class="btn btn-primary btn-login">Log ind</a>
+        </div>
+    </header>
+
+    <main class="content">
+        <div class="page-header reveal">
+            <h1>Regelsæt</h1>
+            <p>De fundamentale love for Evolution RP. Overtrædelse medfører sanktioner.</p>
+        </div>
+
+        <div class="rules-container">
+            <!-- SEKTION 1: SERVERENS KERNEVÆRDIER -->
+            <div class="rule-item reveal">
+                <h3><span>01</span> Kerneværdier & Spilforståelse</h3>
+                <p>Evolution RP handler om at skabe historier, ikke om at vinde. "Play to lose" er en vigtig del af et sundt community.</p>
+                <ul class="rule-list">
+                    <li><b>Roleplay Over Alt:</b> Det primære mål er altid at skabe et spændende scenarie for alle involverede. Hvis du har valget mellem at vinde en biljagt hurtigt eller gøre den spændende i 10 minutter, vælger du det sidste.</li>
+                    <li><b>Ingen "Playing to Win":</b> Det er forbudt altid at gå efter den hurtigste eller nemmeste løsning bare for at vinde. Hvis du bliver fanget, så spil på det og accepter konsekvensen.</li>
+                    <li><b>Kvalitet frem for Kvantitet:</b> Vi forventer, at du lægger energi i din karakters dialog, kropssprog og handlinger.</li>
+                    <li><b>Respekt for Medspillere:</b> Husk at der sidder et menneske bag hver karakter. Toxicity, personlige angreb og dårlig tone OOC straffes hårdt.</li>
+                </ul>
+            </div>
+
+            <!-- SEKTION 2: DEFINITIONER AF REGELBRUD -->
+            <div class="rule-item reveal">
+                <h3><span>02</span> Definitioner & Tekniske Regler</h3>
+                <p>Her er de tekniske termer, du skal kende ud og ind.</p>
+                <ul class="rule-list">
+                    <li><b>RDM (Random Deathmatch):</b> Angreb på andre spillere uden en valid RP-grund og forudgående mundtlig dialog. Du kan ikke bare skyde en person, fordi de kigger mærkeligt på dig.</li>
+                    <li><b>VDM (Vehicle Deathmatch):</b> Brug af køretøjer til at ramme spillere eller genstande med det formål at dræbe eller skade uden for et realistisk scenarie. Køretøjer er transportmidler, ikke missiler.</li>
+                    <li><b>Meta-gaming:</b> Brug af information, som din karakter ikke selv har fundet ud af in-game. Dette inkluderer Discord-chat, streams, eller at genkende folk på deres ID eller stemme, hvis de bærer maske.</li>
+                    <li><b>Powergaming:</b> At tvinge din vilje ned over andre uden at give dem en chance for at reagere, eller at udføre handlinger din karakter fysisk ikke ville kunne (f.eks. bære en hel bil eller løbe efter at være blevet skudt i begge ben).</li>
+                    <li><b>FearRP (Value of Life):</b> Du skal handle som om din karakter er bange for at dø. Hvis tre mand har våben rettet mod dig, rækker du hænderne op. Du trækker ikke dit eget våben i en undertalssituation.</li>
+                    <li><b>Combat Logging:</b> At forlade spillet (Alt+F4, genstart eller crash uden at vende tilbage) for at undgå konsekvenser som fængsel, død eller tab af genstande.</li>
+                    <li><b>NLR (New Life Rule):</b> Når du genopstår, har din karakter fået et "hukommelsestab". Du kan ikke huske hvem der dræbte dig, hvorfor du døde, eller hvor det skete. Du må ikke nærme dig lokationen i 30 minutter.</li>
+                </ul>
+            </div>
+
+            <!-- SEKTION 3: KRIMINELLE REGLER & SCENARIER -->
+            <div class="rule-item reveal">
+                <h3><span>03</span> Kriminelle Retningslinjer</h3>
+                <p>Regler for den kriminelle underverden.</p>
+                <ul class="rule-list">
+                    <li><b>Røveri-krav:</b> Før du starter et røveri (butik, bank, juvelér), skal du sikre dig, at det krævede antal betjente er online. At tjekke dette via F1 er din pligt.</li>
+                    <li><b>Gidseltagning:</b> Gidsler skal findes i spillet. Det er strengt forbudt at bruge venner eller bandemedlemmer som gidsler. Gidset skal have en reel frygt for sit liv.</li>
+                    <li><b>Forhandlinger:</b> Ved røverier skal der altid gives plads til dialog. Politiet skal have en chance for at forhandle, før skyderiet starter.</li>
+                    <li><b>Bandekrige:</b> Konflikter mellem bander skal være baseret på langvarig RP. "Drive-bys" uden forudgående konflikt betragtes som RDM.</li>
+                    <li><b>Scamming:</b> Det er tilladt at snyde folk for mindre beløb (sorte penge/våben), men du må aldrig snyde folk for store værdier som biler, huse eller donationsting.</li>
+                </ul>
+            </div>
+
+            <!-- SEKTION 4: LOVENS ARM (POLITI & STAT) -->
+            <div class="rule-item reveal">
+                <h3><span>04</span> Lovhåndhævelse & Myndigheder</h3>
+                <p>Regler for politi, EMS og ansatte i staten.</p>
+                <ul class="rule-list">
+                    <li><b>Magttrappen:</b> Politiet skal altid starte med det mindst indgribende middel. Man går ikke direkte fra en trafikforseelse til at trække en riffel.</li>
+                    <li><b>Korruption:</b> Som udgangspunkt er alle ansatte i staten lovlydige. Korruption kræver en detaljeret ansøgning til Staff og er begrænset til få udvalgte spillere.</li>
+                    <li><b>Beslaglæggelse:</b> Alle ting der tages fra kriminelle skal registreres korrekt. Man må ikke "gemme" ting til sig selv.</li>
+                    <li><b>EMS-sikkerhed:</b> EMS er neutrale og skal behandles med respekt af alle. De må ikke tages som gidsler under deres arbejde medmindre det er absolut nødvendigt for et unikt scenarie.</li>
+                </ul>
+            </div>
+
+            <!-- SEKTION 5: MILJØ & GENEREL REALISME -->
+            <div class="rule-item reveal">
+                <h3><span>05</span> Miljø, Atmosfære & Safezones</h3>
+                <ul class="rule-list">
+                    <li><b>Safezones:</b> Områder som Hospitalet, Politistationen og Bilforhandleren er "Safezones". Her må der ikke udøves kriminalitet, medmindre et scenarie er startet udenfor og ført derind.</li>
+                    <li><b>Realistisk Kørsel:</b> Vi forventer at du kører realistisk. At hoppe over bjerge i en sportsvogn eller køre 300 km/t igennem midtbyen uden grund betragtes som FailRP.</li>
+                    <li><b>Skades-RP:</b> Hvis du kører galt eller bliver skudt, SKAL du spille på det. Brug /me til at beskrive dine skader, og vent på at EMS ankommer. Du rejser dig ikke bare op og løber videre.</li>
+                    <li><b>Offensive RP:</b> Enhver form for seksuel RP, voldtægt eller tortur kræver OOC-accept fra alle involverede parter. Hvis én siger nej, stopper scenariet øjeblikkeligt.</li>
+                </ul>
+            </div>
+
+            <!-- SEKTION 6: KOMMUNIKATION & OOC ADFÆRD -->
+            <div class="rule-item reveal">
+                <h3><span>06</span> Kommunikation & Teknisk Etik</h3>
+                <ul class="rule-list">
+                    <li><b>Ingen OOC i Voice:</b> At bryde karakter (break character) inde i spillet er en af de værste forseelser. Hold dig altid i din rolle.</li>
+                    <li><b>Stream-Sniping:</b> Hvis vi opdager at du bruger en stream til at finde spillere eller påvirke RP, medfører det permanent udelukkelse uden advarsel.</li>
+                    <li><b>Mikrofon-kvalitet:</b> Du skal have en acceptabel mikrofon. Hvis din stemme er utydelig eller fuld af støj, kan du blive bedt om at forlade serveren indtil det er rettet.</li>
+                    <li><b>Exploits & Bugs:</b> Fund af fejl eller bugs skal rapporteres til Staff. Udnyttelse af disse til egen vinding medfører permanent ban.</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-info">
+                <a href="index.html" class="logo">
+                    <img src="img/logo.png" style="height:35px;">
+                    EVOLUTION<span>RP</span>
+                </a>
+                <p>En ny standard for dansk roleplay. Bygget med fokus på kvalitet og seriøsitet.</p>
+            </div>
+            <div class="footer-col">
+                <h5>Navigation</h5>
+                <ul>
+                    <li><a href="index.html">Hjem</a></li>
+                    <li><a href="regler.html">Regler</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h5>Community</h5>
+                <ul>
+                    <li><a href="#">Discord</a></li>
+                    <li><a href="donation.html">Donation</a></li>
+                    <li><a href="ansøninger.html">Ansøgning</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>&copy; 2026 Evolution RP. Alle rettigheder forbeholdes.</div>
+            <div class="social">
+                <a href="#">DISCORD</a>
+                <a href="#">INSTAGRAM</a>
+                <a href="#">YOUTUBE</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+        // applyGlobalConfig() runs automatically via config.js EventListener
+    </script>
+</body>
+</html>

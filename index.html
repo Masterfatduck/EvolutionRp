@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evolution RP</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Config -->
+    <script src="config.js"></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.2);
+            --bg: #030712;
+            --card: rgba(17, 24, 39, 0.4);
+            --border: rgba(255, 255, 255, 0.06);
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .page-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.2s ease-in-out;
+            transform: translateZ(0); /* Force hardware acceleration */
+            backface-visibility: hidden;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        .page-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(3, 7, 18, 0.3), rgba(3, 7, 18, 0.9) 90%);
+            pointer-events: none;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1400px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 40px;
+            background: rgba(3, 7, 18, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            z-index: 9999;
+            pointer-events: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .logo span { color: var(--primary); }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-dim);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        nav ul li a:hover { color: var(--text); }
+        nav ul li a.active { color: var(--primary); }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            box-shadow: 0 10px 20px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px var(--primary-glow);
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Hero */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 5%;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: clamp(3.5rem, 10vw, 6.5rem);
+            font-weight: 900;
+            line-height: 0.95;
+            margin-bottom: 28px;
+            letter-spacing: -0.05em;
+            max-width: 1100px;
+            text-shadow: 0 10px 50px rgba(0, 0, 0, 0.8);
+            color: #fff;
+        }
+
+        .hero p {
+            color: var(--text-dim);
+            font-size: 1.35rem;
+            max-width: 700px;
+            margin-bottom: 48px;
+            font-weight: 500;
+            line-height: 1.4;
+            opacity: 0.9;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 24px;
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: 60px 5%;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            max-width: 1400px;
+            margin: -100px auto 100px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .stat-card {
+            background: rgba(17, 24, 39, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            padding: 32px 60px;
+            border-radius: 32px;
+            text-align: center;
+            flex: 1;
+            max-width: 350px;
+        }
+
+        .stat-card h3 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 4px;
+            color: #fff;
+            letter-spacing: -1px;
+        }
+
+        .stat-card p {
+            color: var(--primary);
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        /* Features */
+        .features {
+            padding: 100px 5% 150px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 100px;
+        }
+
+        .section-header h2 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 16px;
+            letter-spacing: -2px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 32px;
+        }
+
+        .feature-item {
+            background: rgba(17, 24, 39, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            padding: 60px 48px;
+            border-radius: 40px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .feature-item:hover {
+            background: rgba(17, 24, 39, 0.4);
+            border-color: var(--primary);
+            transform: translateY(-10px);
+        }
+
+        .feature-item i {
+            color: var(--primary);
+            margin-bottom: 32px;
+            padding: 16px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 20px;
+        }
+
+        .feature-item h4 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+        }
+
+        .feature-item p {
+            color: var(--text-dim);
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            padding: 120px 5% 60px;
+            background: #020617;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 100px;
+            max-width: 1400px;
+            margin: 0 auto 100px;
+        }
+
+        .footer-info p {
+            color: var(--text-dim);
+            max-width: 350px;
+            margin-top: 24px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .footer-col h5 {
+            font-size: 0.8rem;
+            font-weight: 800;
+            margin-bottom: 32px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--primary);
+        }
+
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 16px; }
+        .footer-col ul li a { 
+            text-decoration: none; 
+            color: var(--text-dim); 
+            font-size: 0.95rem; 
+            font-weight: 500;
+        }
+        .footer-col ul li a:hover { color: #fff; transform: translateX(5px); display: inline-block; }
+
+        .footer-bottom {
+            padding-top: 60px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .social { display: flex; gap: 32px; }
+        .social a { color: var(--text-dim); text-decoration: none; font-weight: 700; font-size: 0.8rem; letter-spacing: 1px; }
+        .social a:hover { color: var(--primary); }
+
+        @media (max-width: 1024px) {
+            header { width: 95%; padding: 12px 24px; }
+            .footer-grid { grid-template-columns: 1fr; gap: 60px; }
+            nav { display: none; }
+            .hero h1 { font-size: 4rem; }
+            .stats { flex-direction: column; align-items: center; margin-top: 0; }
+            .stat-card { width: 100%; max-width: 100%; }
+        }
+
+        /* Animations fjernet for at sikre synlighed */
+        .reveal {
+            opacity: 1 !important;
+            transform: none !important;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="page-bg">
+        <div class="slide active" style="background-image: url('img/bg1.jpg')"></div>
+        <div class="slide" style="background-image: url('img/bg2.jpg')"></div>
+        <div class="slide" style="background-image: url('img/bg3.jpg')"></div>
+        <div class="slide" style="background-image: url('img/bg4.jpg')"></div>
+        <div class="slide" style="background-image: url('img/bg5.jpg')"></div>
+        <div class="slide" style="background-image: url('img/bg6.jpg')"></div>
+    </div>
+
+    <header>
+        <a href="index.html" class="logo">
+            <i class="fas fa-rocket"></i>
+            EVOLUTION<span>RP</span>
+        </a>
+        <nav>
+            <ul>
+                <li><a href="index.html" class="active">Hjem</a></li>
+                <li><a href="regler.html">Regler</a></li>
+                <li><a href="faq.html">FAQ</a></li>
+                <li><a href="donation.html">Donation</a></li>
+                <li><a href="ansøninger.html">Ansøgninger</a></li>
+            </ul>
+        </nav>
+        <div class="header-actions">
+            <a href="#" class="btn btn-outline">
+                <i class="fab fa-discord"></i> Discord
+            </a>
+            <a href="#" class="btn btn-primary">Log ind</a>
+        </div>
+    </header>
+
+    <main class="hero">
+        <h1 class="reveal">En ny standard for dansk roleplay.</h1>
+        <p class="reveal">Oplev et community bygget på innovation, seriøsitet og teknisk overlegenhed. Velkommen hjem.</p>
+        <div class="hero-btns reveal">
+            <a href="#features" class="btn btn-primary">Udforsk Systemer</a>
+            <a href="regler.html" class="btn btn-outline">Læs Reglerne</a>
+        </div>
+    </main>
+
+    <section class="stats">
+        <div class="stat-card reveal">
+            <h3 id="online-players">Henter...</h3>
+            <p>Spillere Online</p>
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <div class="section-header reveal">
+            <h2>Hvorfor Evolution?</h2>
+        </div>
+        <div class="feature-grid">
+            <div class="feature-item reveal">
+                <i data-lucide="zap" size="32"></i>
+                <h4>Lynhurtig Performance</h4>
+                <p>Vores infrastruktur er optimeret til det maksimale, hvilket sikrer dig den bedste spiloplevelse uden delay.</p>
+            </div>
+            <div class="feature-item reveal">
+                <i data-lucide="code-2" size="32"></i>
+                <h4>Custom Scripts</h4>
+                <p>Vi koder alt fra bunden. Det betyder unikke systemer du ikke finder på andre danske servere.</p>
+            </div>
+            <div class="feature-item reveal">
+                <i data-lucide="users-2" size="32"></i>
+                <h4>Modent Community</h4>
+                <p>Vi vægter kvalitet over kvantitet. Vores staff sikrer et sundt og seriøst miljø for alle spillere.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-info">
+                <a href="index.html" class="logo">
+                    <i class="fas fa-rocket"></i>
+                    EVOLUTION<span>RP</span>
+                </a>
+                <p>Danmarks mest innovative FiveM fællesskab. Bygget af spillere, for spillere.</p>
+            </div>
+            <div class="footer-col">
+                <h5>Navigation</h5>
+                <ul>
+                    <li><a href="index.html">Hjem</a></li>
+                    <li><a href="regler.html">Regler</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h5>Community</h5>
+                <ul>
+                    <li><a href="#">Discord</a></li>
+                    <li><a href="donation.html">Donation</a></li>
+                    <li><a href="ansøninger.html">Ansøgning</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>&copy; 2026 Evolution RP. Powered by <a href="https://discord.gg/Ee6CkAtrYM" target="_blank" style="color:var(--primary); text-decoration:none;"><strong>Suko Shop</strong></a>.</div>
+            <div class="social">
+                <a href="#">DISCORD</a>
+                <a href="#">INSTAGRAM</a>
+                <a href="#">YOUTUBE</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+        // applyGlobalConfig() runs automatically via config.js EventListener
+    </script>
+</body>
+</html>
