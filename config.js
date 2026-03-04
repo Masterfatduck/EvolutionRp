@@ -8,13 +8,13 @@ const WebsiteConfig = {
     discordInvite: "https://discord.gg/FSSGVYsrhP", 
     
     // DISCORD LOGIN SETUP
-    discordClientId: "DIT_CLIENT_ID", 
+    discordClientId: "1478767371593322546", 
     redirectUri: window.location.href.split('#')[0].split('?')[0],
 
     // DISCORD WEBHOOKS
     webhooks: {
-        applications: "DIN_ANSØGNING_WEBHOOK", // Her lander nye ansøgninger
-        answers: "DIT_SVAR_WEBHOOK"            // Her lander svar (godkendt/afvist)
+        applications: "https://discord.com/api/webhooks/1478770783005446291/ftX7lg6Uy23TIy4VwMLgSsDAEMThI1v0kpVSUJQtdkzlAn6nNsfFMXACXD00lFKN7Z5T", // Her lander nye ansøgninger
+        answers: "https://discord.com/api/webhooks/1478770207106269184/1kaJkNpHnivZAVXhz3sXoAxxvP0iz5yhb7SllLWVGEJBqIWoK8fwF23WQEx9-_EivJcPK"            // Her lander svar (godkendt/afvist)
     },
 
     // STYR ANSØGNINGER HER (open / closed)
