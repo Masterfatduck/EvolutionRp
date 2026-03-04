@@ -23,6 +23,7 @@ const WebsiteConfig = {
         ems: "open", 
         staff: "open",
         whitelist: "closed",
+        company: "open",
         ck: "open",
         pk: "open",
         unban: "open"
@@ -162,7 +163,7 @@ function applyGlobalConfig() {
 
         document.title = WebsiteConfig.serverName;
         document.querySelectorAll('.logo').forEach(el => {
-            el.innerHTML = `<img src="img/logo.png" style="height:45px; filter:drop-shadow(0 5px 15px rgba(59,130,246,0.6));"> EVOLUTION<span style="color:var(--primary); margin-left:4px;">RP</span>`;
+            el.innerHTML = `<img src="logo.png" style="height:45px; filter:drop-shadow(0 5px 15px rgba(59,130,246,0.6));"> EVOLUTION<span style="color:var(--primary); margin-left:4px;">RP</span>`;
         });
 
         initSharedSlideshow();
