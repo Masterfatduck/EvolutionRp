@@ -14,7 +14,7 @@ const WebsiteConfig = {
     // DISCORD WEBHOOKS
     webhooks: {
         applications: "https://discord.com/api/webhooks/1478770783005446291/ftX7lg6Uy23TIy4VwMLgSsDAEMThI1v0kpVSUJQtdkzlAn6nNsfFMXACXD00lFKN7Z5T", // Her lander nye ansøgninger
-        answers: "https://discord.com/api/webhooks/1478770207106269184/1kaJkNpHnivZAVXhz3sXoAxxvP0iz5yhb7SllLWVGEJBqIWoK8fwF23WQEx9-_EivJcPK"            // Her lander svar (godkendt/afvist)
+        answers: "https://discord.com/api/webhooks/1478770207106269184/1kaJkNpHnivZAVXhz3sXoAxxvP0iz5yhb7SllLWVGEJBqIWoK8fwF23WQEx9-_EivJcP"            // Her lander svar (godkendt/afvist)
     },
 
     // STYR ANSØGNINGER HER (open / closed)
