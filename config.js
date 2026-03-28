@@ -2,10 +2,10 @@
 const WebsiteConfig = {
     serverName: "Evolution RP",
     tagline: "En ny standard for dansk roleplay.",
-    serverIp: "DIN_SERVER_IP", 
+    serverIp: "45.65.112.42", 
     txAdminPort: "40120",       
     refreshInterval: 5000,      
-    discordInvite: "https://discord.gg/FSSGVYsrhP", 
+    discordInvite: "https://discord.gg/J9SSrK8HfS", 
     
     // SUPABASE CONFIGURATION
     supabaseUrl: "https://hrtevidkppyybdcmyjiy.supabase.co",
@@ -13,8 +13,8 @@ const WebsiteConfig = {
 
     // DISCORD WEBHOOKS
     webhooks: {
-        applications: "DIN_ANSØGNING_WEBHOOK", // Her lander nye ansøgninger
-        answers: "DIT_SVAR_WEBHOOK"            // Her lander svar (godkendt/afvist)
+        applications: "https://discord.com/api/webhooks/1480605440189534424/gLbgsiQQe31HiLtHre-cMo98ooZyTZF0WaTWN33ot5MhRz80agzdsuYpfAp5CEvTZRWW", // Her lander nye ansøgninger
+        answers: "https://discord.com/api/webhooks/1480605448339198139/QvzSQzsEnJOgPlbP6ywIgdLI0d7wdCBA5XFWd_gfOl9F06E_CLs8z5Ms4MuXuCumLDmR"            // Her lander svar (godkendt/afvist)
     },
 
     // STYR ANSØGNINGER HER (open / closed)
