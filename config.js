@@ -1,11 +1,11 @@
-// Evolution RP - Global Website Configuration
+// Project Radiant - Global Website Configuration
 const WebsiteConfig = {
-    serverName: "Evolution RP",
+    serverName: "Project Radiant",
     tagline: "En ny standard for dansk roleplay.",
     serverIp: "45.65.112.42", 
     txAdminPort: "40120",       
     refreshInterval: 5000,      
-    discordInvite: "https://discord.gg/J9SSrK8HfS", 
+    discordInvite: "https://discord.gg/sg3n9nqven", 
     
     // SUPABASE CONFIGURATION
     supabaseUrl: "https://hrtevidkppyybdcmyjiy.supabase.co",
@@ -13,8 +13,8 @@ const WebsiteConfig = {
 
     // DISCORD WEBHOOKS
     webhooks: {
-        applications: "https://discord.com/api/webhooks/1480605440189534424/gLbgsiQQe31HiLtHre-cMo98ooZyTZF0WaTWN33ot5MhRz80agzdsuYpfAp5CEvTZRWW", // Her lander nye ansøgninger
-        answers: "https://discord.com/api/webhooks/1480605448339198139/QvzSQzsEnJOgPlbP6ywIgdLI0d7wdCBA5XFWd_gfOl9F06E_CLs8z5Ms4MuXuCumLDmR"            // Her lander svar (godkendt/afvist)
+        applications: "https://discord.com/api/webhooks/1504945991718277161/TxEqERgMMldKWvyixaEV27NYg27VlwbsaF3q-zJ1sFULHoT_FM7SF-duHR4JParGL3JF", // Her lander nye ansøgninger
+        answers: "https://discord.com/api/webhooks/1504945983623004200/66Pp3sbxN6KiykbNYSvtrM_At06krhhUFrA-8_6KAYw8_UKN5SvnU5PjcOWDJcgq-Sie"            // Her lander svar (godkendt/afvist)
     },
 
     // STYR ANSØGNINGER HER (open / closed)
@@ -256,7 +256,7 @@ function initSharedSlideshow() {
 }
 
 async function applyGlobalConfig() {
-    console.log("Initialiserer Evolution RP system...");
+    console.log("Initialiserer Project Radiant system...");
     try {
         initLoginSystem();
 
@@ -274,7 +274,7 @@ async function applyGlobalConfig() {
 
         document.title = WebsiteConfig.serverName;
         document.querySelectorAll('.logo').forEach(el => {
-            el.innerHTML = `<img src="logo.png" style="height:45px; filter:drop-shadow(0 5px 15px rgba(59,130,246,0.6));"> EVOLUTION<span style="color:var(--primary); margin-left:4px;">RP</span>`;
+            el.innerHTML = `<img src="logo.png" style="height:45px; filter:drop-shadow(0 5px 15px rgba(47, 0, 255, 0.6));">Project Radiant<span style="color:var(--primary); margin-left:4px;"></span>`;
         });
 
         initSharedSlideshow();
